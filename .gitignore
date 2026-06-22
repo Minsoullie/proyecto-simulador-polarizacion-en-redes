@@ -1,0 +1,21 @@
+# sbt
+target/
+project/target/
+project/project/
+.bsp/
+*.class
+*.log
+
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Worksheet evaluation cache
+*.sc.tmp
+
+# Salidas generadas por Benchmark.simEvolucion (archivos .html de cada quien)
+*.html
+
+# OS
+.DS_Store

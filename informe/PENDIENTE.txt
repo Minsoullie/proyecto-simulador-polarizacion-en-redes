@@ -1,0 +1,11 @@
+Aquí va el informe final en PDF (ver criterios de la sección 5 del
+enunciado: estructuras de datos, argumentaciones de corrección,
+paralelización, tablas comparativas y conclusiones).
+
+Sugerencia de secciones (una por responsable, ver REPARTO_TRABAJO.md):
+1. Introducción y modelo (todos)
+2. Paquete Comete: tipos, funciones, corrección (Persona A)
+3. Opinion - parte estática: tipos, rho, showWeightedGraph, corrección (Persona B)
+4. Opinion - parte dinámica: confBiasUpdate, simulate, corrección (Persona C)
+5. Paralelización: rhoPar, confBiasUpdatePar, técnicas usadas, tablas, conclusiones (Persona D)
+6. Conclusiones generales (todos)
