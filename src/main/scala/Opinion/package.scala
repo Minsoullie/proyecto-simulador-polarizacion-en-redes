@@ -4,9 +4,7 @@ import scala.collection.parallel.CollectionConverters._
 
 package object Opinion {
 
-  // ============================================================
-  // TIPOS DE DATOS (no modificar la firma, ya vienen del enunciado)
-  // ============================================================
+
 
   // Si n es el número de agentes, estos se identifican con los enteros
   // entre 0 y n-1. O sea, el conjunto de Agentes A es implícitamente

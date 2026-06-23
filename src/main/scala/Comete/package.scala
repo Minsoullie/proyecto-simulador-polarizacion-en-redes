@@ -1,9 +1,5 @@
 package object Comete {
 
-  // ============================================================
-  // TIPOS DE DATOS (no modificar la firma, ya vienen del enunciado)
-  // ============================================================
-
   /** Valores reales ordenados entre 0 y 1, incluidos 0 y 1, de una distribución. */
   type DistributionValues = Vector[Double]
 
