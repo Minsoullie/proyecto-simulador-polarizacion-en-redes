@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Simulador de Polarización en Redes
 
 Proyecto de curso — Fundamentos de Programación Funcional y Concurrente
@@ -97,3 +98,6 @@ informe.
   - Los paquetes `Comete`, `Opinion`, `common` y `Benchmark`.
   - Un `Readme.txt` (no `.md`) describiendo los archivos entregados y las
     instrucciones de ejecución — responsabilidad de Persona A.
+=======
+# proyecto-simulador-polarizacion-en-redes
+>>>>>>> 8741ad1446b2ccfe76574f89c1b6f09c7d79e310
