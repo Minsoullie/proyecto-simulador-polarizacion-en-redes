@@ -30,11 +30,27 @@ package object Comete {
    * donde el mínimo no puede estar (aprovechando la convexidad).
    */
   def min_p(f: Double => Double, min: Double, max: Double, prec: Double): Double = {
-    // TODO (Persona A)
-    ???
-  }
+    @annotation.tailrec
+    def buscar(left: Double, right: Double): Double = {
+      if ((right - left) < prec) {
+        (left + right) / 2.0
+      } else {
 
-  /**
+        val m1 = left + (right - left) / 3.0
+        val m2 = right - (right - left) / 3.0
+
+        val f1 = f(m1)
+        val f2 = f(m2)
+
+        if (f1 < f2)
+          buscar(left, m2)
+        else
+          buscar(m1, right)
+      }
+    }
+    buscar(min, max)
+  }
+   /**
    * Dados alpha y beta, devuelve la función que calcula la medida de
    * polarización "comete" parametrizada en esos valores:
    *
@@ -46,8 +62,15 @@ package object Comete {
    * en el intervalo [0,1] con una precisión razonable (p.ej. 1e-4 o similar).
    */
   def rhoCMT_Gen(alpha: Double, beta: Double): PolMeasure = {
-    // TODO (Persona A) - usar min_p internamente
-    ???
+    (dist: Distribution) => {
+      val (pi, dv) = dist
+      def rho_aux(p: Double): Double = {
+        pi.zip(dv)
+          .map { case (freq, value) =>
+            math.pow(freq, alpha) * math.pow(math.abs(value - p), beta) } .sum }
+      val pMin = min_p(rho_aux, 0.0, 1.0, 1e-4)
+      rho_aux(pMin)
+    }
   }
 
   /**
@@ -57,8 +80,18 @@ package object Comete {
    * sobre los mismos valores de distribución).
    */
   def normalizar(m: PolMeasure): PolMeasure = {
-    // TODO (Persona A)
-    ???
+    (dist: Distribution) => {
+      val (_, dv) = dist
+      val peorCaso =
+        Vector.tabulate(dv.length) { i =>
+          if (i == 0 || i == dv.length - 1) 0.5
+          else 0.0
+        }
+      val maxPol = m((peorCaso, dv))
+      if (maxPol == 0.0)
+        0.0
+      else m(dist) / maxPol
+    }
   }
 
   // ============================================================
