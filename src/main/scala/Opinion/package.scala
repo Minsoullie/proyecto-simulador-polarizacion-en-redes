@@ -55,8 +55,42 @@ package object Opinion {
    *     Distribution (Pi^b, Y^b) resultante.
    */
   def rho(alpha: Double, beta: Double): AgentsPolMeasure = {
-    // TODO (Persona B)
-    ???
+    (sb: SpecificBelief, d: DistributionValues) => {
+      val n = sb.length
+      val k = d.length
+
+      // 1. Construir los límites izquierdos y derechos de cada intervalo
+      val lefts = (0 until k).map { i =>
+        if (i == 0) 0.0
+        else (d(i - 1) + d(i)) / 2.0
+      }.toVector
+
+      val rights = (0 until k).map { i =>
+        if (i == k - 1) 1.0
+        else (d(i) + d(i + 1)) / 2.0
+      }.toVector
+
+      // 2. Contar agentes por intervalo
+      val counts = sb.foldLeft(Vector.fill(k)(0)) { (acc, belief) =>
+        val idx = (0 until k).find { i =>
+          if (i == k - 1) lefts(i) <= belief && belief <= rights(i)
+          else lefts(i) <= belief && belief < rights(i)
+        }.getOrElse(k - 1) // Por seguridad, si no encuentra, asigna al último
+
+        acc.updated(idx, acc(idx) + 1)
+      }
+
+      // 3. Calcular frecuencias (Π^b): fracción de agentes en cada intervalo
+      val freqs = counts.map(_.toDouble / n)
+
+      // 4. Crear la distribución como una tupla (freqs, d)
+      //    Distribution es exactamente (Frequency, DistributionValues)
+      val distribution: Distribution = (freqs, d)
+
+      // 5. Aplicar la medida comete normalizada
+      val medidaNormalizada = Comete.normalizar(Comete.rhoCMT_Gen(alpha, beta))
+      medidaNormalizada(distribution)
+    }
   }
 
   /**
@@ -66,8 +100,8 @@ package object Opinion {
    * otros agentes.
    */
   def showWeightedGraph(swg: SpecificWeightedGraph): IndexedSeq[IndexedSeq[Double]] = {
-    // TODO (Persona B)
-    ???
+    val (wg, n) = swg  // Extraemos la función de influencia y el número de agentes
+    Vector.tabulate(n)(i => Vector.tabulate(n)(j => wg(i, j)))
   }
 
   // ============================================================
