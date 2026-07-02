@@ -147,8 +147,41 @@ package object Opinion {
    * distribución a partir de la creencia. Reutiliza Comete.rhoCMT_Gen.
    */
   def rhoPar(alpha: Double, beta: Double): AgentsPolMeasure = {
-    // TODO (Persona D)
-    ???
+    (sb: SpecificBelief, d: DistributionValues) => {
+      val cantidadAgentes = sb.length
+      val cantidadValores = d.length
+
+      val izquierdos = (0 until cantidadValores).map { indice =>
+        if (indice == 0) 0.0
+        else (d(indice - 1) + d(indice)) / 2.0
+      }.toVector
+
+      val derechos = (0 until cantidadValores).map { indice =>
+        if (indice == cantidadValores - 1) 1.0
+        else (d(indice) + d(indice + 1)) / 2.0
+      }.toVector
+
+      def indiceDe(creencia: Double): Int = {
+        (0 until cantidadValores).find { indice =>
+          if (indice == cantidadValores - 1) izquierdos(indice) <= creencia && creencia <= derechos(indice)
+          else izquierdos(indice) <= creencia && creencia < derechos(indice)
+        }.getOrElse(cantidadValores - 1)
+      }
+
+      val conteos = sb.par.aggregate(Vector.fill(cantidadValores)(0))(
+        (acumulado, creencia) => {
+          val indice = indiceDe(creencia)
+          acumulado.updated(indice, acumulado(indice) + 1)
+        },
+        (primero, segundo) => primero.zip(segundo).map { case (a, b) => a + b }
+      )
+
+      val frecuencias = conteos.map(_.toDouble / cantidadAgentes)
+      val distribucion: Distribution = (frecuencias, d)
+      val medidaNormalizada = Comete.normalizar(Comete.rhoCMT_Gen(alpha, beta))
+
+      medidaNormalizada(distribucion)
+    }
   }
 
   /**
@@ -162,7 +195,26 @@ package object Opinion {
    * con el paralelismo de datos sobre los agentes.
    */
   def confBiasUpdatePar(sb: SpecificBelief, swg: SpecificWeightedGraph): SpecificBelief = {
-    // TODO (Persona D)
-    ???
+    val (influencia, _) = swg
+
+    sb.indices.par.map { indiceAgente =>
+      val creenciaAgente = sb(indiceAgente)
+      val influyentes = sb.indices.filter(indiceInfluyente => influencia(indiceInfluyente, indiceAgente) > 0.0)
+
+      val nuevaCreencia =
+        if (influyentes.isEmpty) creenciaAgente
+        else {
+          val variacion = influyentes.map { indiceInfluyente =>
+            val diferencia = sb(indiceInfluyente) - creenciaAgente
+            val betaConfirmacion = 1.0 - math.abs(diferencia)
+
+            betaConfirmacion * influencia(indiceInfluyente, indiceAgente) * diferencia
+          }.sum / influyentes.length
+
+          creenciaAgente + variacion
+        }
+
+      indiceAgente -> nuevaCreencia
+    }.seq.toVector.sortBy(_._1).map(_._2)
   }
 }
