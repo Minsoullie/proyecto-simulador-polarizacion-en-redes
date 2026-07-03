@@ -109,9 +109,9 @@ package object Opinion {
    * donde A_i = { j en A : I(j,i) > 0 } y beta_{i,j} = 1 - |b(j) - b(i)|.
    */
   def confBiasUpdate(sb: SpecificBelief, swg: SpecificWeightedGraph): SpecificBelief = {
-    val (influencia, n) = swg
-    Vector.tabulate(n) { i =>
-      val ai = (0 until n).filter(j => influencia(j, i) > 0)
+    val (influencia, _) = swg
+    Vector.tabulate(sb.length) { i =>
+      val ai = (0 until sb.length).filter(j => influencia(j, i) > 0)
       val suma = ai.foldLeft(0.0) { (acc, j) =>
         val beta_ij = 1.0 - math.abs(sb(j) - sb(i))
         acc + beta_ij * influencia(j, i) * (sb(j) - sb(i))
