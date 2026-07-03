@@ -38,10 +38,6 @@ package object Opinion {
 
   type FunctionUpdate = (SpecificBelief, SpecificWeightedGraph) => SpecificBelief
 
-  // ============================================================
-  // RESPONSABLE: PERSONA B (estructura estática de la red)
-  // ============================================================
-
   /**
    * rho es la medida de polarización de agentes basada en comete.
    *
@@ -104,10 +100,6 @@ package object Opinion {
     Vector.tabulate(n)(i => Vector.tabulate(n)(j => wg(i, j)))
   }
 
-  // ============================================================
-  // RESPONSABLE: PERSONA C (evolución dinámica de la red)
-  // ============================================================
-
   /**
    * Aplica la función de actualización del sesgo de confirmación sobre sb,
    * teniendo en cuenta el grafo de influencia swg (sección 2.3):
@@ -117,8 +109,15 @@ package object Opinion {
    * donde A_i = { j en A : I(j,i) > 0 } y beta_{i,j} = 1 - |b(j) - b(i)|.
    */
   def confBiasUpdate(sb: SpecificBelief, swg: SpecificWeightedGraph): SpecificBelief = {
-    // TODO (Persona C)
-    ???
+    val (influencia, n) = swg
+    Vector.tabulate(n) { i =>
+      val ai = (0 until n).filter(j => influencia(j, i) > 0)
+      val suma = ai.foldLeft(0.0) { (acc, j) =>
+        val beta_ij = 1.0 - math.abs(sb(j) - sb(i))
+        acc + beta_ij * influencia(j, i) * (sb(j) - sb(i))
+      }
+      sb(i) + suma / ai.length
+    }
   }
 
   /**
@@ -133,13 +132,8 @@ package object Opinion {
       b0: SpecificBelief,
       t: Int
   ): IndexedSeq[SpecificBelief] = {
-    // TODO (Persona C)
-    ???
+    (1 to t).scanLeft(b0)((b, _) => fu(b, swg))
   }
-
-  // ============================================================
-  // RESPONSABLE: PERSONA D (versiones paralelas)
-  // ============================================================
 
   /**
    * Versión concurrente de rho (misma semántica, normalizada para
